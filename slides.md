@@ -260,69 +260,9 @@ module.exports = {
 
 - こちらで規定されている：https://github.com/estree/estree
   - ※JavaScriptに限らずどの言語にもある一般的な概念
-- ソースコードはそのままだとただの文字列で、意味をもったまとまりに分解できないので、決められた形式のオブジェクトに変換することで、後からLintしたりフォーマットしたりできる
 - ASTは以下のようなツールで見れる
   - https://astexplorer.net/
   - https://ts-ast-viewer.com/
-- ちなみにAbstractがあるということはConcreteもあります
-  - ASTは不要な空白やカッコなどは除いて、意味のあるノードだけをまとめる
-  - Concrete Syntax Treeは空白やカッコも含めて全てのノードをまとめる考え方（らしい）
-  - 参考：https://github.com/estree/estree/issues/41
-  - ASTのほうが一般的なはずだが、たとえばPrettierは空白も扱うのでASTではなくCSTなのか？とか疑問が出ました。詳しい方いたら教えてほしいです！
-
----
-
-例
-```js
-someFunction();
-```
-
-```json
-{
-  "type": "Program",
-  "start": 0,
-  "end": 15,
-  "body": [
-    {
-      "type": "ExpressionStatement",
-      "start": 0,
-      "end": 15,
-      "expression": {
-        "type": "CallExpression",
-        "start": 0,
-        "end": 14,
-        "callee": {
-          "type": "Identifier",
-          "start": 0,
-          "end": 12,
-          "name": "someFunction"
-        },
-        "arguments": [],
-        "optional": false
-      }
-    }
-  ],
-  "sourceType": "module"
-}
-```
-
----
-layout: two-cols
----
-
-<img class="h-[500px]" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/3ffca6fb-4b05-4aa7-924e-2d9f471046ec" height="400" alt="">
-
-::right::
-
-## クイズ
-
-このASTの元のプログラムはなんでしょう？
-
----
-
-## 正解
-
-`import {useState as hook} from 'react'`
 
 ---
 
@@ -338,56 +278,32 @@ layout: two-cols
 
 ---
 
-# 参考
-
-https://github.com/typescript-eslint/typescript-eslint/blob/d2973cca391eeb763d72c5ef2f49cdafe4ffc216/packages/ast-spec/src/declaration/ImportDeclaration/spec.ts
-
-![CleanShot 2023-09-05 at 18 30 18](https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/4e5f26db-a675-4612-a744-33a2c18de71a)
-
-
----
-
-# 既存実装
-
-- `context.getFilename()`で対象のファイル名が取得できる
-- `node.source.value`でImportDeclarationのImport先の名前が取れる
-
-![CleanShot 2023-09-05 at 18 34 24](https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/e4abb386-98e9-42ec-9252-b98f311e319c)
-
----
-
 # 実装方針
 
 - 前述の知識から、今回の目的の一つである「import対象のメンバー名を取得する」方法は`node.specifiers`を使う
-- `node.specifiers`にImport対象が入っていて、それぞれこんな形状だが、Default Importは`imported.name`が無いなど罠があるので存在確認が必要
+- `node.specifiers`にImport対象が入っていて、それぞれこんな形状だが、Default Importは`imported.name`が無い罠がある（import文って3種類あんねん）
 
 ```js
 const importedModules = node.specifiers.filter(spec => 'imported' in spec).map(spec => spec.imported.name)
 ```
 
-```js
-        {
-          "type": "ImportSpecifier",
-          //
-          "imported": {
-            "type": "Identifier",
-            //
-            "name": "useState"
-          },
-          "local": {
-            "type": "Identifier",
-            //
-            "name": "useState"
-          }
-        },
+```ts
+import type { ImportDefaultSpecifier } from '../special/ImportDefaultSpecifier/spec';
+import type { ImportNamespaceSpecifier } from '../special/ImportNamespaceSpecifier/spec';
+import type { ImportSpecifier } from '../special/ImportSpecifier/spec';
+
+export type ImportClause =
+  | ImportDefaultSpecifier
+  | ImportNamespaceSpecifier
+  | ImportSpecifier;
 ```
+
 
 ---
 
-# テストコード
+# テストコードと動作確認
 
 - 本プラグインはありがたいことにテストコードが用意されていたので、手元にCloneして実装した後にデグレがないか実行
-- デグレがないと確認できたら、追加機能分のテストを実装
 - 前述したImportDeclarationが複数パターンある件にハマらないため、モックデータの拡充もついでにした
 
 ## ローカルでの動作確認
@@ -449,10 +365,14 @@ layout: cover
 
 - メンバー構成
   - 全4名（CTO、フルスタック2名、React Nativeエンジニア1名）
-- **【仕組みを憎んで人を憎まず】**
-  - 「仕組み化」を重視しており、より本質的な開発に注力できるように日々課題の発見・解決策の調査や実装をしています
-  - 毎月最大3営業日程度「仕組み化」に関する工数を使います
-  - ESLint、PHPStan、PHPCS、GitHub Actions、新しいSaaSの導入、その他Dev系のライブラリの導入やアプデなどを行います
+- 【仕組みを憎んで人を憎まず】
+  - 毎月**最大3営業日程度**「仕組み化・自動化」に関する工数を使います
+  - 実績の一例
+    - ローカル環境の色々なデータの自動生成・破棄コマンドの作成
+    - PHPStanの導入
+    - SQLのSlow Query検知やN+1の自動テスト時の検知
+    - Mock Service Workerの導入
+    - renovateによるライブラリバージョンアップの自動化
 - 勉強会
   - 1年以上、週1〜2回の社内勉強会を続けています（※業務時間内）
   - https://zenn.dev/manalink_dev/articles/manalink-study-meetup-history-front-and-network
@@ -463,13 +383,13 @@ layout: cover
 
 - 開発メンバーを随時募集しているのですが、いきなり面接等は敷居が高いと思うので
 - 以下募集しています！
-  - 弊社の社内勉強会にゲスト参加
+  - 弊社の社内勉強会にゲスト参加✏️
     - 平日15時〜15時半頃
     - 平日夜
-  - 弊社メンバーとレンタルジムを借りて合同筋トレ
-  - 弊社メンバーと秋葉原の国内最大級のボルダリング上で壁登り
+  - 弊社メンバーとレンタルジムを借りて合同筋トレ💪
+  - 弊社メンバーと秋葉原の国内最大級のボルダリング上で壁登り🧱
   - 普通にカジュアル面談（オンライン30min）
-  - バーにお酒を飲みに行く（私はラム酒がおすすめなのでラム酒デビューしたい方布教させて）
+  - バーにお酒🥃を飲みに行く（私はラム酒がおすすめなのでラム酒デビューしたい方布教させて）
 
 ---
 layout: cover

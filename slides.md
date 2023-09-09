@@ -7,6 +7,8 @@ drawings:
   persist: false
 transition: slide-left
 title: 初めてESLintプラグインにコントリビュートした話
+theme: ./theme
+layout: intro
 ---
 
 # 初めてESLintプラグインに<br>コントリビュートした話
@@ -14,6 +16,7 @@ title: 初めてESLintプラグインにコントリビュートした話
 ## 〜ESLintルール作成のすゝめ〜
 
 @meijin_garden / 株式会社NoSchool CTO
+
 
 ---
 
@@ -51,7 +54,7 @@ h2 {
 - 趣味
   - 将棋☗、カメラ📸、ラム酒🥃、個人開発💻、筋トレ💪、高校野球観戦⚾
 
-<div class="absolute top-12 right-12">
+<div class="absolute top-24 right-12">
 <img class="w-60 h-60 rounded-full" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/09bd0b32-0bcc-4f0d-849a-ccfdd46713ba" alt="">
 </div>
 
@@ -59,7 +62,7 @@ h2 {
 layout: cover
 ---
 
-## ESLintのルール設定にこだわると嬉しいこと
+# ESLintのルール設定にこだわると嬉しいこと
 
 ---
 
@@ -71,9 +74,9 @@ layout: cover
 
 ---
 
-# 課題を「人」の問題と「仕組み」の問題に切り分ける
+# 課題を「人」の問題と「仕組み」の問題に切り分け
 
-<img class="h-[400px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/148002e1-72b4-425c-a6db-f5104a4c889a" alt="">
+<img class="h-[420px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/148002e1-72b4-425c-a6db-f5104a4c889a" alt="">
 
 ---
 
@@ -81,7 +84,7 @@ layout: cover
 
 - git commit時
   - lint-staged/husky で変更ファイルに対してLintを実行する
-  - またはIDEでできるように設定ファイルを配布するなどもあり
+  - IDEでできるように設定ファイルを配布する
 - Pull Request時
   - CIでLintを実行する
   - reviewdogやeslint-changed-filesを使えば、変更ファイルのみを対象にLintを実行できる
@@ -90,13 +93,13 @@ layout: cover
 
 # ESLintでできること
 
-- console.logの入れっぱなしなどイージーミスを防ぐ
+- console.logの入れっぱなしなど**イージーミスを防ぐ**
   - https://eslint.org/docs/latest/rules/no-console
-- いわゆる書き方の好みの問題をPrj内で統一する
+- いわゆる**書き方の好み**の問題をPrj内で統一する
   - https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/jsx-boolean-value.md
-- 見やすくするが、手作業するかしないかが人によって分かれるやつ
+- 見やすくするが、**手作業**するかしないかが人によって分かれるやつ
   - https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/order.md
-- 社内で決めたアーキテクチャを統一する
+- 社内で決めた**アーキテクチャを統一**する
   - https://www.npmjs.com/package/eslint-plugin-strict-dependencies
     - **これが本スライドで話す主題です**
 
@@ -116,17 +119,17 @@ eslint-plugin-strict-dependencies
   - `.eslintrc.js`に設定を書き、破られていたらエラー扱いとする
   - husky/lint-stagedやCIで強制できる
 - 利用例1：プロダクトで決めたアーキテクチャの徹底
-  - `src/components/page`は`src/pages`からしか呼べない
-  - `src/components/features`は`src/pages`からしか呼べない
-  - `src/components/ui`は`src/components/page`、`src/components/features`からしか呼べない
+  - `src/components/page`は`src/pages`からのみ
+  - `src/components/features`は`src/pages`からのみ呼べる
+  - `src/components/ui`は`src/components/page`、`src/components/features`からのみ呼べる
 - 利用例2：外部ライブラリに対する腐敗防止層利用の徹底
-  - MUIのコンポーネントは`src/components/ui`からしか呼べない
-  - `@sentry/react`は`src/libs/sentry.ts`からしか呼べない
-  - `react-icons`は`src/components/ui/icons`からしか呼べない
+  - MUIのコンポーネントは`src/components/ui`からのみ呼べる
+  - `@sentry/react`は`src/libs/sentry.ts`からのみ呼べる
+  - `react-icons`は`src/components/ui/icons`からのみ呼べる
 
 ---
 
-# 設定例（旧eslintrc形式）
+# 設定例（※旧eslintrc形式）
 
 ```js
 module.exports = {
@@ -161,7 +164,7 @@ module.exports = {
 - なので、`Suspense`を直接呼ぶのではなく作ったラッパーを使うように徹底したい
 
 ## 気がついたこと
-- 前述の通り`import A from B`でいうところのBを指定するため、「`react`の中の`Suspense`のみ利用範囲を制限したい」ケースには対応できない
+- 「`react`の中の`Suspense`のみ利用範囲を制限したい」ケースには対応できない
 - これまで通り設定すると、`react`からのimportが全部NGになってしまう
 
 ```js
@@ -173,12 +176,16 @@ module.exports = {
 ```
 
 ---
+layout: cover
+---
 
-# どうするか
+# ではどうするか
 
 ---
 
-# `import A from B`に対して「**BからAを**importしているとき」というより細かな条件を指定できるように機能追加したい！
+# importするメンバも指定できる機能を追加しよう！
+
+`import A from B`に対して「**BからAを**importしているとき」というより細かな条件を指定できるように
 
 イメージ
 
@@ -193,7 +200,7 @@ module.exports = {
 
 ---
 
-# なんか既存の実装を理解したら、実装できそう
+# なんか実装できそう
 既存の実装を理解したら、
 
 **【import文において、import対象のモジュール名を取得する方法と、対象ファイル名を取得する方法】**
@@ -203,6 +210,8 @@ module.exports = {
 ---
 
 # 機能追加するときは（一旦）ここだけ見る
+
+https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/9e4064539a5b571efa7e8ea4c9f84a2f7f1c0926/strict-dependencies/index.js#L19
 
 ```js
 module.exports = {
@@ -230,23 +239,13 @@ module.exports = {
     }
 ```
 
-## `ImportDeclaration`というのは
-- import文のこと
+## `ImportDeclaration`とは
+- AST(後述)におけるimport文のこと
 - 例：`import A from B`
 
-## `ImportDeclaration: checkImport`と指定することで
+## `ImportDeclaration: checkImport`と指定すると
 - ESLintプログラムがimport文を見つけたら、`checkImport`関数を実行するようになる
 - 個人的には脳内で「`onImportDeclarationAppeared: checkImport`」といった風に読み替えて読んでいて、**イベントハンドラをプラグインを通して登録している**と考えるとしっくりきています
-
----
-
-# `ImportDeclaration`って予約語なの？
-
-- 予約語です（適当に決めたら動きません）
-- 他にも`ExportSpecifier`とか`FunctionDeclaration`とか色々ある
-- ESLint実行時には、JavaScriptのソースコードをASTという形式に変換するが、そのときソースコード中の各パーツ（ノードという）に当てられるType
-- なので、これらの名前はJavaScriptのASTで規定されている
-- ESLintって要は「JavaScript内にこういう種類のノードがあったらこういうルールに沿っているかチェックしてね」の集合なので、作りたいルールに応じてASTのノードのTypeを調べて関数を定義していく感じ
 
 ---
 
@@ -257,6 +256,7 @@ module.exports = {
 - ASTは以下のようなツールで見れる
   - https://astexplorer.net/
   - https://ts-ast-viewer.com/
+- 従って、import文のことを`ImportDeclaration`と呼ぶのは予約語です
 
 ---
 
@@ -268,28 +268,20 @@ module.exports = {
 - `ImportDeclaration: checkImport`における`checkImport`関数について
   - 前述の通り、import文が見つかったときにそのimport文に対して実行する関数
   - 第1引数にASTでパースされた`ImportDeclaration`型のオブジェクトが渡される
-  - `ImportDeclaration`型って何やねん。という話ですが、前述のAST Explorerなどで見てもいいし、[typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/ast-spec/src/declaration/ImportDeclaration/spec.ts)に型情報が記載されているのでそちらを見る
+  - `ImportDeclaration`型の詳細はAST Explorerなどで見たり[typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/ast-spec/src/declaration/ImportDeclaration/spec.ts)を見て把握する
 
 ---
 
 # 実装方針
 
 - 前述の知識から、今回の目的の一つである「import対象のメンバー名を取得する」方法は`node.specifiers`を使う
-- `node.specifiers`にImport対象が入っていて、それぞれこんな形状だが、Default Importは`imported.name`が無い罠がある（import文って3種類あんねん）
-
-```js
-const importedModules = node.specifiers.filter(spec => 'imported' in spec).map(spec => spec.imported.name)
-```
 
 ```ts
-import type { ImportDefaultSpecifier } from '../special/ImportDefaultSpecifier/spec';
-import type { ImportNamespaceSpecifier } from '../special/ImportNamespaceSpecifier/spec';
-import type { ImportSpecifier } from '../special/ImportSpecifier/spec';
-
-export type ImportClause =
-  | ImportDefaultSpecifier
-  | ImportNamespaceSpecifier
-  | ImportSpecifier;
+    // ここのnodeはImportDeclaration型
+    function checkImport(node) {
+      // 〜中略〜
+      // specifiersにはImportDefaultSpecifier/ImportNamespaceSpecifier/ImportSpecifier型があり、ImportSpecifierの場合のみimportedが存在する
+      const importedModules = node.specifiers.filter(spec => 'imported' in spec).map(spec => spec.imported.name)
 ```
 
 

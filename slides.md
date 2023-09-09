@@ -76,7 +76,7 @@ layout: cover
 
 # 課題を「人」の問題と「仕組み」の問題に切り分け
 
-<img class="h-[420px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/e931c966-c32b-4e24-81e7-f751ecc2c25a" alt="">
+<img class="h-[420px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/774a45d0-4e3f-4a2d-a1e6-9a26b5653b46" alt="">
 
 ---
 

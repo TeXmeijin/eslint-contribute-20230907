@@ -45,7 +45,7 @@ h2 {
 
 - 名人
   - Twitter(X): [名人｜マナリンクCTO](https://twitter.com/meijin_garden)
-  - Zenn: https://zenn.dev/texmeijin
+  - Zenn: https://zenn.dev/meijin
 - 株式会社NoSchool CTO
   - オンライン家庭教師マナリンク(https://manalink.jp/)
 - 個人開発

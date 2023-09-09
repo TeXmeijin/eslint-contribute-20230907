@@ -76,18 +76,17 @@ layout: cover
 
 # 課題を「人」の問題と「仕組み」の問題に切り分け
 
-<img class="h-[420px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/148002e1-72b4-425c-a6db-f5104a4c889a" alt="">
+<img class="h-[420px] mx-auto" src="https://github.com/TeXmeijin/vite-react-ts-tailwind-firebase-starter/assets/7464929/e931c966-c32b-4e24-81e7-f751ecc2c25a" alt="">
 
 ---
 
-# 仕組みで防ぐ
+# 仕組みで防げることは仕組みで防ぐ
 
-- git commit時
-  - lint-staged/husky で変更ファイルに対してLintを実行する
-  - IDEでできるように設定ファイルを配布する
-- Pull Request時
-  - CIでLintを実行する
-  - reviewdogやeslint-changed-filesを使えば、変更ファイルのみを対象にLintを実行できる
+- 注意する、とか気をつける、といった属人的な方針をネクストアクションにするのは最後の手段にする
+  - レビュワーが頑張る、も同じ
+- 人間は（自分も含め）誰でもミスをする、忘れてしまう可能性がある
+- IDE、git hooks、CIなどを使ってチェックを自動化する
+- 意外とできることは多い
 
 ---
 
@@ -272,6 +271,32 @@ module.exports = {
 
 ---
 
+# `ImportDeclaration`型
+
+https://github.com/typescript-eslint/typescript-eslint/blob/6ed0ca43b1fea58522f1135e224ddc3fe788b40c/packages/ast-spec/src/unions/ImportClause.ts#L5
+
+```ts
+import type { ImportDefaultSpecifier } from '../special/ImportDefaultSpecifier/spec';
+import type { ImportNamespaceSpecifier } from '../special/ImportNamespaceSpecifier/spec';
+import type { ImportSpecifier } from '../special/ImportSpecifier/spec';
+
+export type ImportClause =
+  | ImportDefaultSpecifier
+  | ImportNamespaceSpecifier
+  | ImportSpecifier;
+```
+
+```ts
+export interface ImportSpecifier extends BaseNode {
+  type: AST_NODE_TYPES.ImportSpecifier;
+  local: Identifier;
+  imported: Identifier;
+  importKind: ImportKind;
+}
+```
+
+---
+
 # 実装方針
 
 - 前述の知識から、今回の目的の一つである「import対象のメンバー名を取得する」方法は`node.specifiers`を使う
@@ -290,7 +315,6 @@ module.exports = {
 # テストコードと動作確認
 
 - 本プラグインはありがたいことにテストコードが用意されていたので、手元にCloneして実装した後にデグレがないか実行
-- 前述したImportDeclarationが複数パターンある件にハマらないため、モックデータの拡充もついでにした
 
 ## ローカルでの動作確認
 
@@ -301,12 +325,12 @@ module.exports = {
 
 # Pull Request提出〜マージまで
 
-- 2023年6月30日16時頃：弊社メンバーからSuspenseラッパー実装の発案があり、それに伴ってプラグインへの機能追加を思いつく
-- 6月30日18時頃：なんとなく動くやつができる
-- 7月2日12時頃：テストコードを書き、動作確認もできたのでPRを提出
+- **6月30日**：弊社メンバーからSuspenseラッパー実装の発案があり、それに伴ってプラグインへの機能追加を思いつく
+- **6月30日**：なんとなく動くやつができる
+- **7月2日**：テストコードを書き、動作確認もできたのでPRを提出
   - https://github.com/knowledge-work/eslint-plugin-strict-dependencies/pull/12
   - 和製OSSなので日本語で書けたのがありがたい
-- 8月18日：なんだかんだあってPull Requestをマージしていただけた🎉
+- **8月18日**：なんだかんだあってPull Requestをマージしていただけた🎉
 
 ※今回ESLintプラグインへのコントリビュートは初めてでしたが、ESLintプラグインの作り方自体は昨年から知ってはいました。なので機能追加したいときにすぐに動けたと思います。今すぐ解決したいIssueがなくても、ESLintプラグインの作り方をざっくり知っておくといつか使えるかもしれません
 
@@ -321,11 +345,12 @@ layout: cover
 # まとめ
 
 - ESLintのルール設定にこだわると嬉しいこと
-  - 人の問題と仕組みの問題に切り分けられる
+  - プログラミングで起きる問題は、人の問題と仕組みの問題に切り分けられる
+  - 仕組みの問題のうち、いくつかはESLintで解決できる
 - ESLintプラグインを作る/機能追加するときは
   - ASTの知識は必要だが、丸暗記する必要はない
   - 既存の実装を読んで、どういうノードがあるか、どういうノードを取得すればいいかを理解する
-  - ESLintプラグインでどんなことができるのかを知っておくと、いつかタイミングが来たときに役に立つ
+  - ESLintプラグインでできることを知っておくと、いつかタイミングが来たときに役に立つ
 
 ---
 layout: cover
